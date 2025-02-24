@@ -8,18 +8,18 @@ import plotly.express as px
 st.set_page_config(layout="wide", page_title="E-Commerce Dashboard", page_icon="🛒")
 
 # Load Data
-@st.cache_data
+@st.cache_data(ttl=3600)
 def load_data():
     # Membaca dataset ke dalam DataFrame
-    customers_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/customers_dataset.csv')
-    geolocation_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/geolocation_dataset.csv')
-    order_items_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/order_items_dataset.csv')
-    order_payments_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/order_payments_dataset.csv')
-    order_reviews_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/order_reviews_dataset.csv')
-    orders_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/orders_dataset.csv')
-    product_translation_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/product_category_name_translation.csv')
-    products_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/products_dataset.csv')
-    sellers_df = pd.read_csv('C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 7/Proses Analisis Dataset/E-commerce-public-dataset/sellers_dataset.csv')
+    customers_df = pd.read_csv('E-commerce-public-dataset/customers_dataset.csv')
+    geolocation_df = pd.read_csv('E-commerce-public-dataset/geolocation_dataset.csv')
+    order_items_df = pd.read_csv('E-commerce-public-dataset/order_items_dataset.csv')
+    order_payments_df = pd.read_csv('E-commerce-public-dataset/order_payments_dataset.csv')
+    order_reviews_df = pd.read_csv('E-commerce-public-dataset/order_reviews_dataset.csv')
+    orders_df = pd.read_csv('E-commerce-public-dataset/orders_dataset.csv')
+    product_translation_df = pd.read_csv('E-commerce-public-dataset/product_category_name_translation.csv')
+    products_df = pd.read_csv('E-commerce-public-dataset/products_dataset.csv')
+    sellers_df = pd.read_csv('E-commerce-public-dataset/sellers_dataset.csv')
     
     # Merge data untuk analisis produk terlaris
     products_df = products_df.merge(product_translation_df, on='product_category_name', how='left')
@@ -36,14 +36,14 @@ def load_data():
     total_payment_type = order_payments_df.groupby('payment_type', as_index=False)['payment_value'].sum()
     total_payment_type['payment_value_million'] = total_payment_type['payment_value'] / 1e6
     
-    return (merged_df, city_df, orders_df, products_df, order_items_df, product_translation_df, payments_with_orders, order_reviews_df, order_payments_df, geolocation_df, total_payment_type, customers_df, sellers_df, products_df)
+    return (merged_df, city_df, orders_df, products_df, order_items_df, product_translation_df, payments_with_orders, order_reviews_df, order_payments_df, geolocation_df, total_payment_type, customers_df, sellers_df)
 
 # Load dataset
-datasets=(merged_df, city_df, orders_df, products_df, order_items_df, product_translation_df, payments_with_orders, order_reviews_df, order_payments_df, geolocation_df, total_payment_type, customers_df, sellers_df, products_df) = load_data()
+merged_df, city_df, orders_df, products_df, order_items_df, product_translation_df, payments_with_orders, order_reviews_df, order_payments_df, geolocation_df, total_payment_type, customers_df, sellers_df = load_data()
 
 # Sidebar
 with st.sidebar:
-    st.image("C:/UNIKOM 10123034/UNIKOM 3/Pemrograman Dasar Sains Data/Pertemuan 15/IF1-TUGAS-UAS-KELOMPOK4/Images//logo-unikom.png", width=260)
+    st.image("Images//logo-unikom.png", width=260)
     st.markdown("""
     **Kelompok 4**  
     **Anggota:**  
@@ -56,9 +56,9 @@ with st.sidebar:
     """)
     st.markdown("---")
     st.markdown("## 🗓️ Filter Penjulan")  
-    year_selected = st.sidebar.selectbox("Pilih Tahun", merged_df['year'].unique())
+    year_selected = st.selectbox("Pilih Tahun", merged_df['year'].unique())
     st.header("🔍 Filter Lokasi")
-    kota_terpilih = st.sidebar.selectbox("Pilih Kota:", ["Semua"] + sorted(geolocation_df["geolocation_city"].unique()))
+    kota_terpilih = st.selectbox("Pilih Kota:", ["Semua"] + sorted(geolocation_df["geolocation_city"].unique()))
 
 st.title("📊 Dashboard Analisis E-Commerce")
 st.markdown("---")
@@ -71,12 +71,11 @@ fig_produk = px.bar(product_sales,
                     y='product_category_name_english', 
                     orientation='h',
                     labels={'order_item_id': 'Jumlah Terjual', 'product_category_name_english': 'Kategori Produk'},
-                    title="Top Produk Terlaris",
+                    title="10123034 - Irpan Agun Triyadi",
                     hover_data={'order_item_id': True})
 fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_produk, use_container_width=True)
 st.markdown("---")
-
 
 # Analisis Penjualan Bulanan
 st.subheader("📈 Tren Penjualan Bulanan")
@@ -86,7 +85,8 @@ fig_bulanan = px.line(monthly_sales,
                       y='order_item_id', 
                       markers=True,
                       labels={'month': 'Bulan', 'order_item_id': 'Jumlah Penjualan'},
-                      title="Penjualan Bulanan")
+                      title="10123034 - Irpan Agun Triyadi")
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_bulanan, use_container_width=True)
 st.markdown("---")
 
@@ -99,9 +99,10 @@ fig_kota = px.bar(city_orders,
                   y='customer_city', 
                   orientation='h',
                   labels={'order_id': 'Jumlah Pesanan', 'customer_city': 'Kota'},
-                  title="Top Kota dengan Pesanan Terbanyak",
+                  title="10123034 - Irpan Agun Triyadi",
                   hover_data={'order_id': True},
                   category_orders={'customer_city': city_orders['customer_city'].tolist()})
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_kota, use_container_width=True)
 st.markdown("---")
 
@@ -114,6 +115,7 @@ if "geolocation_zip_code_prefix" in geolocation_df.columns:
     fig_map = px.scatter_mapbox(unique_locations, 
                                 lat="geolocation_lat", lon="geolocation_lng", 
                                 hover_name="geolocation_city", 
+                                title="10123034 - Irpan Agun Triyadi",
                                 color_discrete_sequence=["maroon"], zoom=3, height=600)
 
     fig_map.update_layout(mapbox_style="carto-positron", margin={"r":0,"t":40,"l":0,"b":0})
@@ -135,8 +137,9 @@ loss_per_category = loss_per_category.sort_values(by='price', ascending=False).h
 fig_kerugian = px.pie(loss_per_category, 
                       values='price', 
                       names='product_category_name_english',
-                      title="Kategori Produk dengan Kerugian Terbesar",
+                      title='10123029 - Raihan Rajwa Ali Makmur',
                       hole=0.3)
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_kerugian, use_container_width=True)
 st.markdown("---")
 
@@ -147,7 +150,8 @@ fig_aov = px.line(x=aov_by_date.index,
                   y=aov_by_date.values, 
                   markers=True,
                   labels={'x': 'Tanggal', 'y': 'Total Nilai Pemesanan'},
-                  title="Perubahan Rata-rata Nilai Pemesanan dari Waktu ke Waktu")
+                  title="10123032 - Berry Rizkya Fauzy")
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_aov, use_container_width=True)
 st.markdown("---")
 
@@ -168,14 +172,16 @@ order_reviews = order_reviews.dropna()
 
 # Analisis distribusi review_score
 fig_review_dist = px.histogram(order_reviews, x='review_score', nbins=5, 
-                               title='Distribusi Review Score Pelanggan', 
+                               title='10123033 - Zaki Rahmat Nugroho (Distribusi Review Score Pelanggan)', 
                                color_discrete_sequence=['blue'])
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_review_dist, use_container_width=True)
 
 # Analisis waktu pengiriman berdasarkan review_score
 fig_delivery_time = px.box(order_reviews, x='review_score', y='delivery_time', 
                            title='Waktu Pengiriman Berdasarkan Review Score',
                            color='review_score')
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_delivery_time, use_container_width=True)
 
 # Rata-rata review_score per kategori produk
@@ -183,6 +189,7 @@ avg_review_by_category = order_reviews.groupby('product_category_name_english')[
 fig_avg_review = px.bar(avg_review_by_category, x='review_score', y='product_category_name_english',
                         title='Rata-rata Review Score Berdasarkan Kategori Produk',
                         orientation='h', color='review_score', color_continuous_scale='Greens')
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_avg_review, use_container_width=True)
 
 # Simulasi data korelasi faktor yang mempengaruhi review score
@@ -200,18 +207,21 @@ correlation = data.corr()
 # Visualisasi Korelasi antar Faktor
 fig_correlation = px.imshow(correlation, text_auto=True, color_continuous_scale='PuBuGn',
                             title='Matriks Korelasi Antar Faktor yang Mempengaruhi Review Score')
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_correlation, use_container_width=True)
 
 # Pengaruh Product Quality terhadap Review Score
 fig_quality = px.box(data, x='Review_Score', y='Product_Quality',
                      title='Pengaruh Product Quality terhadap Review Score',
                      color='Review_Score')
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_quality, use_container_width=True)
 
 # Pengaruh Delivery Time terhadap Review Score
 fig_delivery = px.box(data, x='Review_Score', y='Delivery_Time',
                       title='Pengaruh Delivery Time terhadap Review Score',
                       color='Review_Score')
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_delivery, use_container_width=True)
 st.markdown("---")
 
@@ -224,12 +234,13 @@ fig = px.bar(
     text="payment_value_million",
     labels={'payment_type': 'Tipe Pembayaran', 'payment_value_million': 'Total Pengeluaran (Juta)'},
     color="payment_type",
+    title='10123036 - Naufal Putra Firmansyah',
     color_discrete_sequence=px.colors.sequential.Blues
 )
 
 fig.update_traces(texttemplate='%{text:.2f}M', textposition='outside')
 fig.update_layout(xaxis_title="Tipe Pembayaran", yaxis_title="Total Pengeluaran (Juta)", showlegend=False)
-
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig, use_container_width=True)
 st.markdown("---")
 
@@ -257,7 +268,7 @@ fig = px.bar(
     x="Product",
     y="Frequency",
     text="Frequency",
-    title="Frekuensi Produk yang Dibeli",
+    title="10123037 - Vadya Aditya Syahputra",
     labels={"Product": "Nama Produk", "Frequency": "Jumlah Pembelian"},
     color="Product",
     color_discrete_sequence=px.colors.qualitative.Set3
@@ -265,7 +276,7 @@ fig = px.bar(
 
 fig.update_traces(textposition="outside")
 fig.update_layout(xaxis_tickangle=-45)
-
+fig_produk.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig, use_container_width=True)
 st.markdown("---")
 
